@@ -1,0 +1,37 @@
+/* Apply basic styles to the entire body */
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+/* Style the chat container */
+#chat-container {
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+    height: 400px;
+    border: 1px solid #ccc;
+    padding: 10px;
+}
+/* Style the chat box */
+#chat-box {
+    flex: 1;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    padding: 5px;
+    margin-bottom: 10px;
+}
+/* Style the message input field */
+#message-input {
+    flex: none;
+    padding: 5px;
+    margin-bottom: 5px;
+}
+/* Style the send button */
+#send-button {
+    flex: none;
+    padding: 5px;
+}
