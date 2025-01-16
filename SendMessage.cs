@@ -1,35 +1,47 @@
-using System;
+// Import necessary namespaces for the function
 using System.IO;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.Azure.SignalR.Management;
 using Newtonsoft.Json;
+using System.Threading.Tasks;
 
-namespace chat_app
+public static class SendMessage
 {
-    public static class SendMessage
+    // Define the SignalR connection string (replace this with your actual connection string)
+    private static readonly string connectionString = "YOUR_SIGNALR_CONNECTION_STRING";
+
+    // Create a HubContext to interact with SignalR
+    private static readonly ServiceHubContext hubContext = new ServiceManagerBuilder()
+        .WithOptions(o => o.ConnectionString = connectionString)
+        .BuildServiceManager()
+        .CreateHubContextAsync("chatHub")
+        .Result;
+
+    // Define the SendMessage function
+    [FunctionName("SendMessage")]
+    public static async Task<IActionResult> Run(
+        // Trigger the function using an HTTP POST request
+        [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req,
+        ILogger log)
     {
-        [FunctionName("SendMessage")]
-        public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
-            ILogger log)
-        {
-            log.LogInformation("C# HTTP trigger function processed a request.");
+        // Read the request body
+        string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
 
-            string name = req.Query["name"];
+        // Deserialize the request body into a dynamic object
+        dynamic data = JsonConvert.DeserializeObject(requestBody);
 
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            dynamic data = JsonConvert.DeserializeObject(requestBody);
-            name = name ?? data?.name;
+        // Extract the message from the request body
+        string message = data?.message;
 
-            string responseMessage = string.IsNullOrEmpty(name)
-                ? "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response."
-                : $"Hello, {name}. This HTTP triggered function executed successfully.";
+        // Send the message to all connected SignalR clients
+        await hubContext.Clients.All.SendAsync("ReceiveMessage", message);
 
-            return new OkObjectResult(responseMessage);
-        }
+        // Return a response indicating the message was sent successfully
+        return new OkObjectResult("Message sent");
     }
 }
