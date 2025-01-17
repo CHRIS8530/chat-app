@@ -7,6 +7,9 @@ const http = require('http');
 // Import the Socket.IO library for real-time web socket communication
 const socketIo = require('socket.io');
 
+// Import the path module to handle file paths
+const path = require('path');
+
 // Create an instance of an Express application
 const app = express();
 
@@ -16,10 +19,8 @@ const server = http.createServer(app);
 // Create a Socket.IO server and attach it to the HTTP server
 const io = socketIo(server);
 
-// Define a route handler for the root URL ("/")
-app.get('/', (req, res) => {
-    res.send('Server is running');
-});
+// Serve static files from the 'docs' directory
+app.use(express.static(path.join(__dirname, '../docs')));
 
 // Set up an event listener for new connections to the Socket.IO server
 io.on('connection', (socket) => {
@@ -38,4 +39,5 @@ io.on('connection', (socket) => {
 });
 
 // Start the HTTP server and have it listen on port 4000
-server.listen(4000, () => console.log('Server running on port 4000'));
+const PORT = process.env.PORT || 4000;
+server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
