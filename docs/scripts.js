@@ -1,5 +1,5 @@
 // Establish a connection to the Socket.IO server at the specified URL
-const socket = io('http://localhost:4000');
+const socket = io('https://');
 
 // Add an event listener to the send button
 document.getElementById('send-button').addEventListener('click', () => {
