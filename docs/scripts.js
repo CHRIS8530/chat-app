@@ -1,5 +1,5 @@
 // Establish a connection to the Socket.IO server at the specified URL
-const socket = io('https://85df-213-172-134-253.ngrok-free.app');
+const socket = io(process.env.NGROK_URL);
 
 // Add an event listener to the send button
 document.getElementById('send-button').addEventListener('click', () => {
